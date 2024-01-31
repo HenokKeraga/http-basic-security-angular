@@ -28,7 +28,7 @@ class PersonController {
                 .list();
     }
 
-    @GetMapping("/student/{id}")
+    @GetMapping("/students/{id}")
     public Student getSingleStudent(@PathVariable("id") int id) {
 
         return jdbcClient.sql("SELECT * FROM student where id =:id")
@@ -37,7 +37,7 @@ class PersonController {
                 .single();
     }
 
-    @DeleteMapping("/student/{id}")
+    @DeleteMapping("/students/{id}")
     public int deleteStudent(@PathVariable("id") int id) {
         return jdbcClient.sql("DELETE FROM student where id=:id")
                 .params(Map.of("id", id))
@@ -47,15 +47,29 @@ class PersonController {
     @PutMapping("/student")
     public int updateStudent(@RequestBody Student student) {
         System.out.println(" ):::  " + student);
-        return jdbcClient.sql("UPDATE student set name=:name,department=:department where id=:id")
+        return jdbcClient.sql("UPDATE student set name=:name,department=:department,age=:age where id=:id")
                 .params(Map.of("id", student.id(), "name", student.name(), "department", student.department()))
                 .update();
     }
 
     @PostMapping("/student")
-    public int addStudent(@RequestBody Student student) {
-        return jdbcClient.sql("Insert into student (name,department) values (:name,:department) ")
-                .params(Map.of("name", student.name(), "department", student.department()))
+    public Student addStudent(@RequestBody Student student) {
+        var n = jdbcClient.sql("Insert into student (name,department,age) values (:name,:department,:age) ")
+                .params(Map.of("name", student.name(), "department", student.department(), "age", student.age()))
+                .update();
+        if (n == 1) {
+            return student;
+        }
+        throw new RuntimeException("Student is not created");
+
+    }
+
+    @PatchMapping("/students/{id}")
+    public int updateAge(@PathVariable("id") Integer id, @RequestBody Student student) {
+
+        return this.jdbcClient.sql("UPDATE student set age=:age where id=:id")
+                .param("id", id)
+                .param("age", student.age())
                 .update();
     }
 
