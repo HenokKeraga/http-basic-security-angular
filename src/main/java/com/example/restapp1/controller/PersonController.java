@@ -20,6 +20,11 @@ class PersonController {
         this.jdbcClient = jdbcClient;
     }
 
+    @GetMapping("/login")
+    public boolean login() {
+        return true;
+    }
+
     @GetMapping("/students")
     public List<Student> hello() {
 
@@ -66,7 +71,7 @@ class PersonController {
 
     @PatchMapping("/students/{id}")
     public int updateAge(@PathVariable("id") Integer id, @RequestBody Student student) {
-
+        System.out.println("path ) ::: " + student);
         return this.jdbcClient.sql("UPDATE student set age=:age where id=:id")
                 .param("id", id)
                 .param("age", student.age())
